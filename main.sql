@@ -1,4 +1,4 @@
-DROP TABLE bibliobuses;
+DROP TABLE bibuses;
 DROP TABLE rutas;
 DROP TABLE municipios;
 DROP TABLE bibliotecas;
@@ -9,19 +9,36 @@ DROP TABLE ejemplares;
 DROP TABLE prestamos;
 DROP TABLE sanciones;
 
-CREATE TABLE bibliobuses (
+CREATE TABLE bibuses (
   matricula VARCHAR(10),
   estado VARCHAR(20),
+  pasaporte_bibusero VARCHAR(20),
+  id_ruta INT,
   PRIMARY KEY matricula,
+  FOREIGN KEY (pasaporte_bibusero) REFERENCES bibuseros(pasaporte),
+  FOREIGN KEY (id_ruta) REFERENCES rutas(id),
   CONSTRAINT ck_estado CHECK (estado IN ('disponible', 'en ruta', 'en revision'))
+);
+
+CREATE TABLE bibuseros (
+  pasaporte VARCHAR(20)
+  nombre VARCHAR(100),
+  apellidos VARCHAR(100),
+  email VARCHAR(100),
+  telefono VARCHAR(20),
+  inicio_contrato DATE,
+  fin_contrato DATE,
+  estado VARCHAR(20),
+  matricula_bibus VARCHAR(10),
+  PRIMARY KEY pasaporte,
+  FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula),
+  CONSTRAINT ck_estado CHECK (estado IN ( ))
 );
 
 CREATE TABLE rutas (
   id INT AUTO_INCREMENT,
-  fecha DATE,
-  bibud_id INT,
+  paradas VARCHAR(200),
   PRIMARY KEY id,
-  FOREIGN KEY (bibus_id) REFERENCES bibliobuses(id)
 );
 
 CREATE TABLE municipios (
@@ -91,13 +108,24 @@ CREATE TABLE ejemplares (
 
 CREATE TABLE prestamos (
   id INT AUTO_INCREMENT,
-  usuario_pasaporte VARCHAR(20),
+  pasaporte_usuario VARCHAR(20),
   signatura VARCHAR(20),
   fecha_prestamo DATE,
   fecha_devolucion DATE,
   estado VARCHAR(20),
   PRIMARY KEY id,
-  FOREIGN KEY (usuario_pasaporte) REFERENCES usuarios(pasaporte),
+  FOREIGN KEY (pasaporte_usuario) REFERENCES usuarios(pasaporte),
+  FOREIGN KEY (signatura) REFERENCES ejemplares(signatura)
+);
+
+CREATE TABLE reservas (
+  id INT AUTO_INCREMENT,
+  pasaporte_usuario VARCHAR(20),
+  signatura VARCHAR(20),
+  fecha_inicio DATE,
+  fecha_fin DATE,
+  PRIMARY KEY id,
+  FOREIGN KEY (pasaporte_usuario) REFERENCES usuarios(pasaporte),
   FOREIGN KEY (signatura) REFERENCES ejemplares(signatura)
 );
 
