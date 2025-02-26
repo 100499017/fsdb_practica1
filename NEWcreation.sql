@@ -22,8 +22,16 @@ CREATE TABLE bibuses (
 );
 
 CREATE TABLE paradas (
-  id INT AUTO_INCREMENT,
-  PRIMARY KEY id
+  id INT AUTO_INCREMENT NOT NULL,
+  matricula_bibus VARCHAR(10) NOT NULL,
+  municipio VARCHAR(100) NOT NULL,
+  poblacion VARCHAR(100) NOT NULL,
+  fecha DATE NOT NULL,
+  hora TIME NOT NULL,
+  direccion VARCHAR(200) NOT NULL,
+  PRIMARY KEY id,
+  FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula),
+  FOREIGN KEY (municipio, poblacion) REFERENCES municipios(nombre, poblacion)
 )
 
 -- COMPLETADA
@@ -124,7 +132,8 @@ CREATE TABLE ejemplares (
   signatura VARCHAR(20) NOT NULL,
   isbn_edicion VARCHAR(20) NOT NULL,
   estado VARCHAR(20) NOT NULL,
-  disponible BOOLEAN NOT NULL,
+  dado_de_baja BOOLEAN NOT NULL,
+  fecha_baja DATE,
   comentarios_bibusero VARCHAR(500),
   PRIMARY KEY signatura,
   FOREIGN KEY (isbn_edicion) REFERENCES ediciones(isbn),
