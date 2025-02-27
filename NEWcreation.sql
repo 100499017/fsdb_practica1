@@ -197,7 +197,7 @@ CREATE TABLE ejemplares (
 CREATE TABLE prestamos (
   id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
   id_usuario INT NOT NULL,
-  signatura VARCHAR2(20),
+  signatura VARCHAR2(20) NOT NULL,
   fecha_prestamo DATE,
   fecha_devolucion DATE,
   fecha_comentario DATE,
