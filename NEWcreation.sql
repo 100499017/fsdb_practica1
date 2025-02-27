@@ -19,7 +19,7 @@ CREATE TABLE bibuses (
   proxima_itv DATE NOT NULL,
   pasaporte_bibusero VARCHAR2(20) NOT NULL,
   PRIMARY KEY matricula,
-  FOREIGN KEY (pasaporte_bibusero) REFERENCES bibuseros(pasaporte),
+  FOREIGN KEY (pasaporte_bibusero) REFERENCES bibuseros(pasaporte) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT ck_estado CHECK (estado IN ('disponible', 'en ruta', 'en revision'))
 );
 
@@ -34,8 +34,8 @@ CREATE TABLE paradas (
   hora TIME NOT NULL,
   direccion VARCHAR2(100) NOT NULL,
   PRIMARY KEY id,
-  FOREIGN KEY (id_ruta) REFERENCES rutas(id),
-  FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula),
+  FOREIGN KEY (id_ruta) REFERENCES rutas(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (municipio, poblacion) REFERENCES municipios(nombre, poblacion)
 )
 
@@ -54,17 +54,17 @@ CREATE TABLE bibuseros (
   estado VARCHAR2(15) NOT NULL,
   matricula_bibus VARCHAR2(10),
   PRIMARY KEY pasaporte,
-  FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula),
+  FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT ck_estado CHECK (estado IN ('en ruta', 'en descanso', 'sin ruta'))
 );
 
--- COMPLETADA
+-- NO MODIFICAR
 CREATE TABLE rutas (
   id CHAR(5) NOT NULL,
   fecha DATE NOT NULL,
   matricula_bibus VARCHAR(10) NOT NULL,
   PRIMARY KEY id,
-  FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula)
+  FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- NO MODIFICAR
@@ -77,7 +77,7 @@ CREATE TABLE municipios (
   CONSTRAINT ck_tiene_libreria CHECK (tiene_libreria IN ('S', 'N'))
 );
 
--- COMPLETADA
+-- NO MODIFICAR
 CREATE TABLE bibliotecas (
   cif VARCHAR(20) NOT NULL,
   email VARCHAR(100) NOT NULL,
@@ -88,10 +88,10 @@ CREATE TABLE bibliotecas (
   municipio VARCHAR(100) NOT NULL,
   poblacion VARCHAR(100) NOT NULL,
   PRIMARY KEY cif,
-  FOREIGN KEY (municipio, poblacion) REFERENCES municipios(nombre, poblacion)
+  FOREIGN KEY (municipio, poblacion) REFERENCES municipios(nombre, poblacion) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
---
+-- NO MODIFICAR
 CREATE TABLE usuarios (
   id INT AUTO_INCREMENT NOT NULL
   pasaporte VARCHAR2(20) NOT NULL,
@@ -104,7 +104,7 @@ CREATE TABLE usuarios (
   direccion VARCHAR2(200) NOT NULL,
   municipio VARCHAR2(100) NOT NULL,
   PRIMARY KEY id,
-  FOREIGN KEY (municipio) REFERENCES municipios(nombre)
+  FOREIGN KEY (municipio) REFERENCES municipios(nombre) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- NO MODIFICAR
@@ -143,7 +143,7 @@ CREATE TABLE ediciones (
   id_biblioteca_nacional VARCHAR2(30) NOT NULL,
   url_edicion VARCHAR2(200) NOT NULL,
   PRIMARY KEY isbn,
-  FOREIGN KEY (titulo, autor_principal) REFERENCES libros(titulo, autor_principal)
+  FOREIGN KEY (titulo, autor_principal) REFERENCES libros(titulo, autor_principal) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- NO MODIFICAR
@@ -157,13 +157,13 @@ CREATE TABLE ejemplares (
   fecha_baja DATE,
   comentarios_bibusero VARCHAR(500),
   PRIMARY KEY signatura,
-  FOREIGN KEY (titulo, autor_principal) REFERENCES libros(titulo, autor_principal),
-  FOREIGN KEY (isbn) REFERENCES ediciones(isbn),
+  FOREIGN KEY (titulo, autor_principal) REFERENCES libros(titulo, autor_principal) ON DELETE RESTRICT ON UPDATE CASCADE,
+  FOREIGN KEY (isbn) REFERENCES ediciones(isbn) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT ck_estado CHECK (estado IN ('nuevo', 'bueno', 'gastado', 'muy usado', 'deteriorado')),
   CONSTRAINT ck_dado_de_baja CHECK (dado_de_baja IN ('S', 'N'))
 );
 
---
+-- NO MODIFICAR
 CREATE TABLE prestamos (
   id INT AUTO_INCREMENT NOT NULL,
   id_usuario INT NOT NULL,
@@ -173,8 +173,8 @@ CREATE TABLE prestamos (
   fecha_comentario DATE,
   comentario VARCHAR2(2000),
   PRIMARY KEY id,
-  FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
-  FOREIGN KEY (signatura) REFERENCES ejemplares(signatura)
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  FOREIGN KEY (signatura) REFERENCES ejemplares(signatura) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- NO MODIFICAR
@@ -185,8 +185,8 @@ CREATE TABLE reservas (
   fecha_inicio DATE NOT NULL,
   fecha_fin DATE NOT NULL,
   PRIMARY KEY id,
-  FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
-  FOREIGN KEY (signatura) REFERENCES ejemplares(signatura)
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  FOREIGN KEY (signatura) REFERENCES ejemplares(signatura) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- NO MODIFICAR
@@ -196,5 +196,7 @@ CREATE TABLE sanciones (
   fecha_inicio DATE NOT NULL,
   fecha_fin DATE NOT NULL,
   PRIMARY KEY id,
-  FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE RESTRICT ON UPDATE CASCADE
 )
+
+COMMIT;
