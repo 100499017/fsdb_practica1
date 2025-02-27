@@ -11,7 +11,7 @@ DROP TABLE prestamos;
 DROP TABLE reservas;
 DROP TABLE sanciones;
 
--- COMPLETADA
+-- NO MODIFICAR
 CREATE TABLE bibuses (
   matricula VARCHAR2(10) NOT NULL,
   estado VARCHAR2(20) NOT NULL,
@@ -23,31 +23,36 @@ CREATE TABLE bibuses (
   CONSTRAINT ck_estado CHECK (estado IN ('disponible', 'en ruta', 'en revision'))
 );
 
--- COMPLETADA
+-- NO MODIFICAR
 CREATE TABLE paradas (
   id INT AUTO_INCREMENT NOT NULL,
+  id_ruta INT NOT NULL,
   matricula_bibus VARCHAR2(10) NOT NULL,
-  municipio VARCHAR2(100) NOT NULL,
-  poblacion VARCHAR2(100) NOT NULL,
+  municipio VARCHAR2(50) NOT NULL,
+  poblacion VARCHAR2(10) NOT NULL,
   fecha DATE NOT NULL,
   hora TIME NOT NULL,
-  direccion VARCHAR2(200) NOT NULL,
+  direccion VARCHAR2(100) NOT NULL,
   PRIMARY KEY id,
+  FOREIGN KEY (id_ruta) REFERENCES rutas(id),
   FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula),
   FOREIGN KEY (municipio, poblacion) REFERENCES municipios(nombre, poblacion)
 )
 
--- COMPLETADA
+-- NO MODIFICAR
 CREATE TABLE bibuseros (
-  pasaporte VARCHAR(20) NOT NULL,
-  nombre VARCHAR(100) NOT NULL,
-  apellidos VARCHAR(100) NOT NULL,
-  email VARCHAR(100) NOT NULL,
+  pasaporte VARCHAR2(20) NOT NULL,
+  email VARCHAR(50) NOT NULL,
+  nombre VARCHAR2(20) NOT NULL,
+  apellido1 VARCHAR2(20) NOT NULL,
+  apellido2 VARCHAR2(20),
+  fecha_nacimiento DATE NOT NULL,
   telefono CHAR(9) NOT NULL,
+  direccion VARCHAR2(100) NOT NULL,
   inicio_contrato DATE NOT NULL,
   fin_contrato DATE,
-  estado VARCHAR(20) NOT NULL,
-  matricula_bibus VARCHAR(10),
+  estado VARCHAR2(15) NOT NULL,
+  matricula_bibus VARCHAR2(10),
   PRIMARY KEY pasaporte,
   FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula),
   CONSTRAINT ck_estado CHECK (estado IN ('en ruta', 'en descanso', 'sin ruta'))
@@ -55,22 +60,20 @@ CREATE TABLE bibuseros (
 
 -- COMPLETADA
 CREATE TABLE rutas (
-  id INT AUTO_INCREMENT NOT NULL,
-  paradas VARCHAR(200) NOT NULL,
+  id CHAR(5) NOT NULL,
   fecha DATE NOT NULL,
   matricula_bibus VARCHAR(10) NOT NULL,
   PRIMARY KEY id,
   FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula)
 );
 
--- COMPLETADA
+-- NO MODIFICAR
 CREATE TABLE municipios (
-  nombre VARCHAR(100) NOT NULL,
-  poblacion VARCHAR(100) NOT NULL,
-  provincia VARCHAR2(100) NOT NULL,
-  tiene_libreria CHAR(1),
+  nombre VARCHAR(50) NOT NULL,
+  poblacion VARCHAR2(20) NOT NULL,
+  provincia VARCHAR2(30) NOT NULL,
+  tiene_libreria VARCHAR2(15),
   PRIMARY KEY (nombre, poblacion),
-  FOREIGN KEY (biblioteca_cif) REFERENCES bibliotecas(cif),
   CONSTRAINT ck_tiene_libreria CHECK (tiene_libreria IN ('S', 'N'))
 );
 
@@ -90,42 +93,43 @@ CREATE TABLE bibliotecas (
 
 --
 CREATE TABLE usuarios (
-  id INT AUTO_INCREMENT,
-  pasaporte VARCHAR(20) NOT NULL,
-  email VARCHAR(100),
-  nombre VARCHAR(100) NOT NULL,
-  apellido1 VARCHAR(100),
-  apellido2 VARCHAR(100),
-  fecha_nacimiento DATE,
-  telefono CHAR(9),
-  direccion VARCHAR(200),
-  municipio VARCHAR(100),
+  id INT AUTO_INCREMENT NOT NULL
+  pasaporte VARCHAR2(20) NOT NULL,
+  email VARCHAR2(100),
+  nombre VARCHAR2(100) NOT NULL,
+  apellido1 VARCHAR2(100) NOT NULL,
+  apellido2 VARCHAR2(100),
+  fecha_nacimiento DATE NOT NULL,
+  telefono CHAR(9) NOT NULL,
+  direccion VARCHAR2(200) NOT NULL,
+  municipio VARCHAR2(100) NOT NULL,
   PRIMARY KEY id,
   FOREIGN KEY (municipio) REFERENCES municipios(nombre)
 );
 
--- COMPLETADA
+-- NO MODIFICAR
 CREATE TABLE libros (
-  titulo VARCHAR(200) NOT NULL,
-  autor_principal VARCHAR(150) NOT NULL,
-  pais_publicacion VARCHAR(50) NOT NULL,
-  lengua_original VARCHAR(50) NOT NULL,
+  titulo VARCHAR2(200) NOT NULL,
+  autor_principal VARCHAR2(100) NOT NULL,
+  pais_publicacion VARCHAR2(50) NOT NULL,
+  lengua_original VARCHAR2(50) NOT NULL,
   fecha_publicacion DATE NOT NULL,
-  titulos_alternativos VARCHAR(200),
-  tema VARCHAR(100),
-  notas_contenido VARCHAR(500),
-  premios VARCHAR(200),
-  mencion_autores VARCHAR(500),
+  titulos_alternativos VARCHAR2(200),
+  tema VARCHAR2(100) NOT NULL,
+  premios VARCHAR2(200),
+  otros_autores VARCHAR2(200),
+  mencion_autores VARCHAR2(200),
+  notas_contenido VARCHAR2(500),
   PRIMARY KEY (titulo, autor_principal)
 );
 
--- COMPLETADA
+-- NO MODIFICAR
 CREATE TABLE ediciones (
   isbn VARCHAR2(20) NOT NULL,
   titulo VARCHAR2(200) NOT NULL,
-  autor_principal VARCHAR2(150) NOT NULL,
+  autor_principal VARCHAR2(100) NOT NULL,
   lengua_principal VARCHAR2(50) NOT NULL,
-  otras_lenguas VARCHAR2(200),
+  otras_lenguas VARCHAR2(100),
   edicion VARCHAR2(20) NOT NULL,
   editorial VARCHAR2(100) NOT NULL,
   extension VARCHAR2(50) NOT NULL,
@@ -136,61 +140,61 @@ CREATE TABLE ediciones (
   otras_caracteristicas VARCHAR2(200),
   material_ajeno VARCHAR2(200),
   notas VARCHAR2(500),
-  id_biblioteca_nacional CHAR(14) NOT NULL,
+  id_biblioteca_nacional VARCHAR2(30) NOT NULL,
   url_edicion VARCHAR2(200) NOT NULL,
   PRIMARY KEY isbn,
   FOREIGN KEY (titulo, autor_principal) REFERENCES libros(titulo, autor_principal)
 );
 
--- COMPLETADA
+-- NO MODIFICAR
 CREATE TABLE ejemplares (
-  signatura VARCHAR(20) NOT NULL,
-  titulo VARCHAR(200) NOT NULL,
-  autor_principal VARCHAR(150) NOT NULL,
-  isbn_edicion VARCHAR(20) NOT NULL,
-  estado VARCHAR(20) NOT NULL,
-  dado_de_baja CHAR(1) NOT NULL,
+  signatura VARCHAR2(20) NOT NULL,
+  titulo VARCHAR2(200) NOT NULL,
+  autor_principal VARCHAR2(100) NOT NULL,
+  isbn VARCHAR2(20) NOT NULL,
+  estado VARCHAR2(20) NOT NULL,
+  dado_de_baja VARCHAR2(15),
   fecha_baja DATE,
   comentarios_bibusero VARCHAR(500),
   PRIMARY KEY signatura,
   FOREIGN KEY (titulo, autor_principal) REFERENCES libros(titulo, autor_principal),
-  FOREIGN KEY (isbn_edicion) REFERENCES ediciones(isbn),
+  FOREIGN KEY (isbn) REFERENCES ediciones(isbn),
   CONSTRAINT ck_estado CHECK (estado IN ('nuevo', 'bueno', 'gastado', 'muy usado', 'deteriorado')),
   CONSTRAINT ck_dado_de_baja CHECK (dado_de_baja IN ('S', 'N'))
 );
 
 --
 CREATE TABLE prestamos (
-  id INT AUTO_INCREMENT,
-  pasaporte_usuario VARCHAR(20),
-  signatura VARCHAR(20),
+  id INT AUTO_INCREMENT NOT NULL,
+  id_usuario INT NOT NULL,
+  signatura VARCHAR2(20),
   fecha_prestamo DATE,
   fecha_devolucion DATE,
-  estado VARCHAR(20),
+  fecha_comentario DATE,
+  comentario VARCHAR2(2000),
   PRIMARY KEY id,
-  FOREIGN KEY (pasaporte_usuario) REFERENCES usuarios(pasaporte),
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
   FOREIGN KEY (signatura) REFERENCES ejemplares(signatura)
 );
 
---
+-- NO MODIFICAR
 CREATE TABLE reservas (
-  id INT AUTO_INCREMENT,
-  pasaporte_usuario VARCHAR(20),
-  signatura VARCHAR(20),
-  fecha_inicio DATE,
-  fecha_fin DATE,
+  id INT AUTO_INCREMENT NOT NULL,
+  id_usuario INT NOT NULL,
+  signatura VARCHAR2(20) NOT NULL,
+  fecha_inicio DATE NOT NULL,
+  fecha_fin DATE NOT NULL,
   PRIMARY KEY id,
-  FOREIGN KEY (pasaporte_usuario) REFERENCES usuarios(pasaporte),
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
   FOREIGN KEY (signatura) REFERENCES ejemplares(signatura)
 );
 
---
+-- NO MODIFICAR
 CREATE TABLE sanciones (
-  id INT AUTO_INCREMENT,
-  usuario_pasaporte VARCHAR(20),
-  fecha_inicio DATE,
-  fecha_fin DATE,
-  semanas_sancion INT,
+  id INT AUTO_INCREMENT NOT NULL,
+  id_usuario INT NOT NULL,
+  fecha_inicio DATE NOT NULL,
+  fecha_fin DATE NOT NULL,
   PRIMARY KEY id,
-  FOREIGN KEY (usuario_pasaporte) REFERENCES usuarios(pasaporte)
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
 )
