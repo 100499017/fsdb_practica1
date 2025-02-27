@@ -135,9 +135,9 @@ CREATE TABLE usuarios (
 CREATE TABLE libros (
   titulo VARCHAR2(200) NOT NULL,
   autor_principal VARCHAR2(100) NOT NULL,
-  pais_publicacion VARCHAR2(50) NOT NULL,
+  pais_publicacion VARCHAR2(50),
   lengua_original VARCHAR2(50),
-  fecha_publicacion DATE NOT NULL,
+  fecha_publicacion DATE,
   titulos_alternativos VARCHAR2(200),
   tema VARCHAR2(100),
   premios VARCHAR2(200),

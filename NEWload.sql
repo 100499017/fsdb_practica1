@@ -4,6 +4,23 @@
 
 INSERT INTO libros (titulo, autor_principal, pais_publicacion, lengua_original, fecha_publicacion,
     titulos_alternativos, tema, premios, otros_autores, mencion_autores, notas_contenido)
-    SELECT DISTINCT title, main_author, pub_country, main_language, pub_date, alt_title, topic,
-        awards, other_authors, mention_authors, content_notes
-    FROM fsdb.acervus;
+SELECT DISTINCT p.title,
+                p.main_author,
+                p.pub_country,
+                p.main_language,
+                p.pub_date,
+                p.alt_title,
+                p.topic,
+                p.awards,
+                p.other_authors,
+                p.mention_authors,
+                p.content_notes
+FROM fsdb.acervus p
+WHERE p.title IS NOT NULL
+AND p.main_author IS NOT NULL
+AND NOT EXISTS (
+    SELECT 1
+    FROM libros l
+    WHERE l.titulo = p.title
+    AND l.autor_principal = p.main_author
+);
