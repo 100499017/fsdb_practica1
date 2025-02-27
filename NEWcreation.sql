@@ -1,15 +1,21 @@
-DROP TABLE bibuses;
-DROP TABLE bibuseros;
-DROP TABLE rutas;
-DROP TABLE municipios;
-DROP TABLE bibliotecas;
-DROP TABLE usuarios;
-DROP TABLE libros;
-DROP TABLE ediciones;
-DROP TABLE ejemplares;
-DROP TABLE prestamos;
-DROP TABLE reservas;
-DROP TABLE sanciones;
+DROP TABLE bibuses CASCADE CONSTRAINTS;
+DROP TABLE paradas CASCADE CONSTRAINTS;
+DROP TABLE bibuseros CASCADE CONSTRAINTS;
+DROP TABLE rutas CASCADE CONSTRAINTS;
+DROP TABLE municipios CASCADE CONSTRAINTS;
+DROP TABLE bibliotecas CASCADE CONSTRAINTS;
+DROP TABLE usuarios CASCADE CONSTRAINTS;
+DROP TABLE libros CASCADE CONSTRAINTS;
+DROP TABLE ediciones CASCADE CONSTRAINTS;
+DROP TABLE ejemplares CASCADE CONSTRAINTS;
+DROP TABLE prestamos CASCADE CONSTRAINTS;
+DROP TABLE reservas CASCADE CONSTRAINTS;
+DROP TABLE sanciones CASCADE CONSTRAINTS;
+
+/**
+Los DROP TABLE no eliminaban algunas tablas porque tenian dependencias con otras tablas, por lo que
+se agrego CASCADE CONSTRAINTS para eliminar las tablas con dependencias.
+**/
 
 -- NO MODIFICAR
 CREATE TABLE bibuses (
@@ -18,29 +24,29 @@ CREATE TABLE bibuses (
   ultima_itv DATE NOT NULL,
   proxima_itv DATE NOT NULL,
   PRIMARY KEY (matricula),
-  CONSTRAINT ck_estado CHECK (estado IN ('disponible', 'en ruta', 'en revision'))
+  CONSTRAINT ck_bibus_estado CHECK (estado IN ('disponible', 'en ruta', 'en revision'))
 );
 
 -- NO MODIFICAR
 CREATE TABLE paradas (
-  id INT AUTO_INCREMENT NOT NULL,
+  id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
   id_ruta VARCHAR2(10) NOT NULL,
   matricula_bibus VARCHAR2(10) NOT NULL,
   municipio VARCHAR2(50) NOT NULL,
   poblacion VARCHAR2(10) NOT NULL,
   fecha DATE NOT NULL,
-  hora TIME NOT NULL,
+  hora VARCHAR2(8) NOT NULL,
   direccion VARCHAR2(100) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT fk_ruta
+  CONSTRAINT fk_parada_ruta
     FOREIGN KEY (id_ruta)
     REFERENCES rutas(id)
     ON DELETE CASCADE,
-  CONSTRAINT fk_bibus
+  CONSTRAINT fk_parada_bibus
     FOREIGN KEY (matricula_bibus)
     REFERENCES bibuses(matricula)
     ON DELETE CASCADE,
-  CONSTRAINT fk_municipio
+  CONSTRAINT fk_parada_municipio
     FOREIGN KEY (municipio, poblacion)
     REFERENCES municipios(nombre, poblacion)
     ON DELETE CASCADE
@@ -58,14 +64,14 @@ CREATE TABLE bibuseros (
   direccion VARCHAR2(100) NOT NULL,
   inicio_contrato DATE NOT NULL,
   fin_contrato DATE,
-  estado VARCHAR2(15) NOT NULL DEFAULT 'en descanso',
+  estado VARCHAR2(15) DEFAULT 'en descanso' NOT NULL,
   matricula_bibus VARCHAR2(10),
   PRIMARY KEY (pasaporte),
-  CONSTRAINT fk_bibus
+  CONSTRAINT fk_bibusero_bibus
     FOREIGN KEY (matricula_bibus)
     REFERENCES bibuses(matricula)
-    ON DELETE SET NULL
-  CONSTRAINT ck_estado CHECK (estado IN ('en ruta', 'en descanso', 'sin ruta'))
+    ON DELETE SET NULL,
+  CONSTRAINT ck_bibusero_estado CHECK (estado IN ('en ruta', 'en descanso', 'sin ruta'))
 );
 
 -- NO MODIFICAR
@@ -74,7 +80,7 @@ CREATE TABLE rutas (
   fecha DATE NOT NULL,
   matricula_bibus VARCHAR(10) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT fk_bibus
+  CONSTRAINT fk_ruta_bibus
     FOREIGN KEY (matricula_bibus)
     REFERENCES bibuses(matricula)
     ON DELETE CASCADE
@@ -87,7 +93,7 @@ CREATE TABLE municipios (
   provincia VARCHAR2(30) NOT NULL,
   tiene_libreria VARCHAR2(15),
   PRIMARY KEY (nombre, poblacion),
-  CONSTRAINT ck_tiene_libreria CHECK (tiene_libreria IN ('S', 'N'))
+  CONSTRAINT ck_municipio_tiene_libreria CHECK (tiene_libreria IN ('S', 'N'))
 );
 
 -- NO MODIFICAR
@@ -101,15 +107,14 @@ CREATE TABLE bibliotecas (
   municipio VARCHAR(100) NOT NULL,
   poblacion VARCHAR(100) NOT NULL,
   PRIMARY KEY (cif),
-  CONSTRAINT fk_municipio
+  CONSTRAINT fk_biblioteca_municipio
     FOREIGN KEY (municipio, poblacion)
     REFERENCES municipios(nombre, poblacion)
-    ON UPDATE CASCADE
 );
 
 -- NO MODIFICAR
 CREATE TABLE usuarios (
-  id INT AUTO_INCREMENT NOT NULL,
+  id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
   pasaporte VARCHAR2(20) NOT NULL,
   email VARCHAR2(100),
   nombre VARCHAR2(100) NOT NULL,
@@ -121,10 +126,9 @@ CREATE TABLE usuarios (
   municipio VARCHAR2(100) NOT NULL,
   poblacion VARCHAR2(100) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT fk_municipio
+  CONSTRAINT fk_usuario_municipio
     FOREIGN KEY (municipio, poblacion)
     REFERENCES municipios(nombre, poblacion)
-    ON UPDATE CASCADE
 );
 
 -- NO MODIFICAR
@@ -163,10 +167,9 @@ CREATE TABLE ediciones (
   id_biblioteca_nacional VARCHAR2(30) NOT NULL,
   url_edicion VARCHAR2(200),
   PRIMARY KEY (isbn),
-  CONSTRAINT fk_libro
+  CONSTRAINT fk_edicion_libro
     FOREIGN KEY (titulo, autor_principal)
     REFERENCES libros(titulo, autor_principal)
-    ON UPDATE CASCADE
 );
 
 -- NO MODIFICAR
@@ -175,24 +178,24 @@ CREATE TABLE ejemplares (
   titulo VARCHAR2(200) NOT NULL,
   autor_principal VARCHAR2(100) NOT NULL,
   isbn VARCHAR2(20) NOT NULL,
-  estado VARCHAR2(20) NOT NULL DEFAULT 'nuevo',
+  estado VARCHAR2(20) DEFAULT 'nuevo' NOT NULL,
   dado_de_baja VARCHAR2(15) DEFAULT 'N',
   fecha_baja DATE,
   comentarios_bibusero VARCHAR(500),
   PRIMARY KEY (signatura),
-  CONSTRAINT fk_libro
+  CONSTRAINT fk_ejemplar_libro
     FOREIGN KEY (titulo, autor_principal)
     REFERENCES libros(titulo, autor_principal),
-  CONSTRAINT fk_edicion
+  CONSTRAINT fk_ejemplar_edicion
     FOREIGN KEY (isbn)
     REFERENCES ediciones(isbn),
-  CONSTRAINT ck_estado CHECK (estado IN ('nuevo', 'bueno', 'gastado', 'muy usado', 'deteriorado')),
-  CONSTRAINT ck_dado_de_baja CHECK (dado_de_baja IN ('S', 'N'))
+  CONSTRAINT ck_ejemplar_estado CHECK (estado IN ('nuevo', 'bueno', 'gastado', 'muy usado', 'deteriorado')),
+  CONSTRAINT ck_ejemplar_dado_de_baja CHECK (dado_de_baja IN ('S', 'N'))
 );
 
 -- NO MODIFICAR
 CREATE TABLE prestamos (
-  id INT AUTO_INCREMENT NOT NULL,
+  id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
   id_usuario INT NOT NULL,
   signatura VARCHAR2(20),
   fecha_prestamo DATE,
@@ -200,41 +203,41 @@ CREATE TABLE prestamos (
   fecha_comentario DATE,
   comentario VARCHAR2(2000),
   PRIMARY KEY (id),
-  CONSTRAINT fk_usuario
+  CONSTRAINT fk_prestamo_usuario
     FOREIGN KEY (id_usuario)
     REFERENCES usuarios(id),
-  CONSTRAINT fk_ejemplar
+  CONSTRAINT fk_prestamo_ejemplar
     FOREIGN KEY (signatura)
     REFERENCES ejemplares(signatura)
 );
 
 -- NO MODIFICAR
 CREATE TABLE reservas (
-  id INT AUTO_INCREMENT NOT NULL,
+  id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
   id_usuario INT NOT NULL,
   signatura VARCHAR2(20) NOT NULL,
   fecha_inicio DATE NOT NULL,
   fecha_fin DATE NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT fk_usuario
+  CONSTRAINT fk_reserva_usuario
     FOREIGN KEY (id_usuario)
     REFERENCES usuarios(id),
-  CONSTRAINT fk_ejemplar
+  CONSTRAINT fk_reserva_ejemplar
     FOREIGN KEY (signatura)
     REFERENCES ejemplares(signatura)
 );
 
 -- NO MODIFICAR
 CREATE TABLE sanciones (
-  id INT AUTO_INCREMENT NOT NULL,
+  id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
   id_usuario INT NOT NULL,
   fecha_inicio DATE NOT NULL,
   fecha_fin DATE NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT fk_usuario
+  CONSTRAINT fk_sancion_usuario
     FOREIGN KEY (id_usuario)
     REFERENCES usuarios(id)
-)
+);
 
 COMMIT;
 
