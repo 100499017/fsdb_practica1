@@ -17,26 +17,33 @@ CREATE TABLE bibuses (
   estado VARCHAR2(20) NOT NULL,
   ultima_itv DATE NOT NULL,
   proxima_itv DATE NOT NULL,
-  pasaporte_bibusero VARCHAR2(20) NOT NULL,
-  PRIMARY KEY matricula,
-  FOREIGN KEY (pasaporte_bibusero) REFERENCES bibuseros(pasaporte) ON DELETE SET NULL ON UPDATE CASCADE,
+  PRIMARY KEY (matricula),
   CONSTRAINT ck_estado CHECK (estado IN ('disponible', 'en ruta', 'en revision'))
 );
 
 -- NO MODIFICAR
 CREATE TABLE paradas (
   id INT AUTO_INCREMENT NOT NULL,
-  id_ruta INT NOT NULL,
+  id_ruta VARCHAR2(10) NOT NULL,
   matricula_bibus VARCHAR2(10) NOT NULL,
   municipio VARCHAR2(50) NOT NULL,
   poblacion VARCHAR2(10) NOT NULL,
   fecha DATE NOT NULL,
   hora TIME NOT NULL,
   direccion VARCHAR2(100) NOT NULL,
-  PRIMARY KEY id,
-  FOREIGN KEY (id_ruta) REFERENCES rutas(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (municipio, poblacion) REFERENCES municipios(nombre, poblacion)
+  PRIMARY KEY (id),
+  CONSTRAINT fk_ruta
+    FOREIGN KEY (id_ruta)
+    REFERENCES rutas(id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_bibus
+    FOREIGN KEY (matricula_bibus)
+    REFERENCES bibuses(matricula)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_municipio
+    FOREIGN KEY (municipio, poblacion)
+    REFERENCES municipios(nombre, poblacion)
+    ON DELETE CASCADE
 )
 
 -- NO MODIFICAR
@@ -51,20 +58,26 @@ CREATE TABLE bibuseros (
   direccion VARCHAR2(100) NOT NULL,
   inicio_contrato DATE NOT NULL,
   fin_contrato DATE,
-  estado VARCHAR2(15) NOT NULL,
+  estado VARCHAR2(15) NOT NULL DEFAULT 'en descanso',
   matricula_bibus VARCHAR2(10),
-  PRIMARY KEY pasaporte,
-  FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula) ON DELETE SET NULL ON UPDATE CASCADE,
+  PRIMARY KEY (pasaporte),
+  CONSTRAINT fk_bibus
+    FOREIGN KEY (matricula_bibus)
+    REFERENCES bibuses(matricula)
+    ON DELETE SET NULL
   CONSTRAINT ck_estado CHECK (estado IN ('en ruta', 'en descanso', 'sin ruta'))
 );
 
 -- NO MODIFICAR
 CREATE TABLE rutas (
-  id CHAR(5) NOT NULL,
+  id VARCHAR2(10) NOT NULL,
   fecha DATE NOT NULL,
   matricula_bibus VARCHAR(10) NOT NULL,
-  PRIMARY KEY id,
-  FOREIGN KEY (matricula_bibus) REFERENCES bibuses(matricula) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (id),
+  CONSTRAINT fk_bibus
+    FOREIGN KEY (matricula_bibus)
+    REFERENCES bibuses(matricula)
+    ON DELETE CASCADE
 );
 
 -- NO MODIFICAR
@@ -87,8 +100,11 @@ CREATE TABLE bibliotecas (
   direccion VARCHAR(200) NOT NULL,
   municipio VARCHAR(100) NOT NULL,
   poblacion VARCHAR(100) NOT NULL,
-  PRIMARY KEY cif,
-  FOREIGN KEY (municipio, poblacion) REFERENCES municipios(nombre, poblacion) ON DELETE RESTRICT ON UPDATE CASCADE
+  PRIMARY KEY (cif),
+  CONSTRAINT fk_municipio
+    FOREIGN KEY (municipio, poblacion)
+    REFERENCES municipios(nombre, poblacion)
+    ON UPDATE CASCADE
 );
 
 -- NO MODIFICAR
@@ -103,8 +119,12 @@ CREATE TABLE usuarios (
   telefono CHAR(9) NOT NULL,
   direccion VARCHAR2(200) NOT NULL,
   municipio VARCHAR2(100) NOT NULL,
-  PRIMARY KEY id,
-  FOREIGN KEY (municipio) REFERENCES municipios(nombre) ON DELETE RESTRICT ON UPDATE CASCADE
+  poblacion VARCHAR2(100) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_municipio
+    FOREIGN KEY (municipio, poblacion)
+    REFERENCES municipios(nombre, poblacion)
+    ON UPDATE CASCADE
 );
 
 -- NO MODIFICAR
@@ -112,10 +132,10 @@ CREATE TABLE libros (
   titulo VARCHAR2(200) NOT NULL,
   autor_principal VARCHAR2(100) NOT NULL,
   pais_publicacion VARCHAR2(50) NOT NULL,
-  lengua_original VARCHAR2(50) NOT NULL,
+  lengua_original VARCHAR2(50),
   fecha_publicacion DATE NOT NULL,
   titulos_alternativos VARCHAR2(200),
-  tema VARCHAR2(100) NOT NULL,
+  tema VARCHAR2(100),
   premios VARCHAR2(200),
   otros_autores VARCHAR2(200),
   mencion_autores VARCHAR2(200),
@@ -128,22 +148,25 @@ CREATE TABLE ediciones (
   isbn VARCHAR2(20) NOT NULL,
   titulo VARCHAR2(200) NOT NULL,
   autor_principal VARCHAR2(100) NOT NULL,
-  lengua_principal VARCHAR2(50) NOT NULL,
+  lengua_principal VARCHAR2(50),
   otras_lenguas VARCHAR2(100),
-  edicion VARCHAR2(20) NOT NULL,
+  edicion VARCHAR2(20),
   editorial VARCHAR2(100) NOT NULL,
   extension VARCHAR2(50) NOT NULL,
   serie VARCHAR2(100),
-  deposito_legal VARCHAR2(50) NOT NULL,
+  deposito_legal VARCHAR2(50),
   lugar_publicacion VARCHAR2(100) NOT NULL,
-  dimensiones VARCHAR2(50) NOT NULL,
+  dimensiones VARCHAR2(50),
   otras_caracteristicas VARCHAR2(200),
   material_ajeno VARCHAR2(200),
   notas VARCHAR2(500),
   id_biblioteca_nacional VARCHAR2(30) NOT NULL,
-  url_edicion VARCHAR2(200) NOT NULL,
-  PRIMARY KEY isbn,
-  FOREIGN KEY (titulo, autor_principal) REFERENCES libros(titulo, autor_principal) ON DELETE RESTRICT ON UPDATE CASCADE
+  url_edicion VARCHAR2(200),
+  PRIMARY KEY (isbn),
+  CONSTRAINT fk_libro
+    FOREIGN KEY (titulo, autor_principal)
+    REFERENCES libros(titulo, autor_principal)
+    ON UPDATE CASCADE
 );
 
 -- NO MODIFICAR
@@ -152,13 +175,17 @@ CREATE TABLE ejemplares (
   titulo VARCHAR2(200) NOT NULL,
   autor_principal VARCHAR2(100) NOT NULL,
   isbn VARCHAR2(20) NOT NULL,
-  estado VARCHAR2(20) NOT NULL,
-  dado_de_baja VARCHAR2(15),
+  estado VARCHAR2(20) NOT NULL DEFAULT 'nuevo',
+  dado_de_baja VARCHAR2(15) DEFAULT 'N',
   fecha_baja DATE,
   comentarios_bibusero VARCHAR(500),
-  PRIMARY KEY signatura,
-  FOREIGN KEY (titulo, autor_principal) REFERENCES libros(titulo, autor_principal) ON DELETE RESTRICT ON UPDATE CASCADE,
-  FOREIGN KEY (isbn) REFERENCES ediciones(isbn) ON DELETE RESTRICT ON UPDATE CASCADE,
+  PRIMARY KEY (signatura),
+  CONSTRAINT fk_libro
+    FOREIGN KEY (titulo, autor_principal)
+    REFERENCES libros(titulo, autor_principal),
+  CONSTRAINT fk_edicion
+    FOREIGN KEY (isbn)
+    REFERENCES ediciones(isbn),
   CONSTRAINT ck_estado CHECK (estado IN ('nuevo', 'bueno', 'gastado', 'muy usado', 'deteriorado')),
   CONSTRAINT ck_dado_de_baja CHECK (dado_de_baja IN ('S', 'N'))
 );
@@ -172,9 +199,13 @@ CREATE TABLE prestamos (
   fecha_devolucion DATE,
   fecha_comentario DATE,
   comentario VARCHAR2(2000),
-  PRIMARY KEY id,
-  FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  FOREIGN KEY (signatura) REFERENCES ejemplares(signatura) ON DELETE RESTRICT ON UPDATE CASCADE
+  PRIMARY KEY (id),
+  CONSTRAINT fk_usuario
+    FOREIGN KEY (id_usuario)
+    REFERENCES usuarios(id),
+  CONSTRAINT fk_ejemplar
+    FOREIGN KEY (signatura)
+    REFERENCES ejemplares(signatura)
 );
 
 -- NO MODIFICAR
@@ -184,9 +215,13 @@ CREATE TABLE reservas (
   signatura VARCHAR2(20) NOT NULL,
   fecha_inicio DATE NOT NULL,
   fecha_fin DATE NOT NULL,
-  PRIMARY KEY id,
-  FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  FOREIGN KEY (signatura) REFERENCES ejemplares(signatura) ON DELETE RESTRICT ON UPDATE CASCADE
+  PRIMARY KEY (id),
+  CONSTRAINT fk_usuario
+    FOREIGN KEY (id_usuario)
+    REFERENCES usuarios(id),
+  CONSTRAINT fk_ejemplar
+    FOREIGN KEY (signatura)
+    REFERENCES ejemplares(signatura)
 );
 
 -- NO MODIFICAR
@@ -195,8 +230,18 @@ CREATE TABLE sanciones (
   id_usuario INT NOT NULL,
   fecha_inicio DATE NOT NULL,
   fecha_fin DATE NOT NULL,
-  PRIMARY KEY id,
-  FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE RESTRICT ON UPDATE CASCADE
+  PRIMARY KEY (id),
+  CONSTRAINT fk_usuario
+    FOREIGN KEY (id_usuario)
+    REFERENCES usuarios(id)
 )
 
 COMMIT;
+
+/**
+ERRORES
+
+1. En las claves foraneas dio error porque no declaramos un constraint antes de poner las restricciones
+   semanticas para mantener la integridad de los datos. Despues de poner CONSTRAINT en todas las claves
+   foraneas, dejo de dar error.
+**/
