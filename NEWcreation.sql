@@ -143,6 +143,7 @@ CREATE TABLE usuarios (
     PRIMARY KEY (id),
   CONSTRAINT uk_usuario_pasaporte UNIQUE (pasaporte),    --$ UNIQUE
   CONSTRAINT uk_usuario_telefono UNIQUE (telefono),    --$ UNIQUE
+  CONSTRAINT uk_usuario_email UNIQUE (email),    --$ UNIQUE
   CONSTRAINT fk_usuario_municipio
     FOREIGN KEY (municipio, poblacion)
     REFERENCES municipios(nombre, poblacion)
