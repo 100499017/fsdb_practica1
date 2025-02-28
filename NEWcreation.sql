@@ -52,7 +52,7 @@ CREATE TABLE paradas (
     FOREIGN KEY (municipio, poblacion)
     REFERENCES municipios(nombre, poblacion)
     ON DELETE CASCADE
-)
+);
 
 -- NO MODIFICAR
 CREATE TABLE bibuseros (
@@ -146,7 +146,7 @@ CREATE TABLE libros (
   lengua_original VARCHAR2(50),
   fecha_publicacion DATE,
   titulos_alternativos VARCHAR2(200),
-  tema VARCHAR2(100),
+  tema VARCHAR2(200),
   premios VARCHAR2(200),
   otros_autores VARCHAR2(200),
   mencion_autores VARCHAR2(200),
