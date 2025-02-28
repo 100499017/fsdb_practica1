@@ -40,6 +40,9 @@ CREATE TABLE paradas (
   direccion VARCHAR2(100) NOT NULL,
   CONSTRAINT pk_parada
     PRIMARY KEY (id),
+  CONSTRAINT uk_parada_id_ruta UNIQUE (id_ruta),    --$ UNIQUE
+  CONSTRAINT uk_parada_municipio UNIQUE (telefono),    --$ UNIQUE
+  CONSTRAINT uk_parada_direccion UNIQUE (direccion),    --$ UNIQUE
   CONSTRAINT fk_parada_ruta
     FOREIGN KEY (id_ruta)
     REFERENCES rutas(id)
@@ -70,6 +73,7 @@ CREATE TABLE bibuseros (
   matricula_bibus VARCHAR2(10),
   CONSTRAINT pk_bibusero
     PRIMARY KEY (pasaporte),
+  CONSTRAINT uk_bibusero_telefono UNIQUE (telefono),    --$ UNIQUE
   CONSTRAINT fk_bibusero_bibus
     FOREIGN KEY (matricula_bibus)
     REFERENCES bibuses(matricula)
@@ -84,6 +88,7 @@ CREATE TABLE rutas (
   matricula_bibus VARCHAR(10) NOT NULL,
   CONSTRAINT pk_ruta
     PRIMARY KEY (id),
+  CONSTRAINT uk_ruta_matricula_bibus UNIQUE (matricula_bibus),    --$ UNIQUE
   CONSTRAINT fk_ruta_bibus
     FOREIGN KEY (matricula_bibus)
     REFERENCES bibuses(matricula)
@@ -113,6 +118,8 @@ CREATE TABLE bibliotecas (
   poblacion VARCHAR(100) NOT NULL,
   CONSTRAINT pk_biblioteca
     PRIMARY KEY (cif),
+  CONSTRAINT uk_biblioteca_telefono UNIQUE (telefono),    --$ UNIQUE
+  CONSTRAINT uk_biblioteca_municipio UNIQUE (municipio),    --$ UNIQUE
   CONSTRAINT fk_biblioteca_municipio
     FOREIGN KEY (municipio, poblacion)
     REFERENCES municipios(nombre, poblacion)
@@ -133,6 +140,8 @@ CREATE TABLE usuarios (
   poblacion VARCHAR2(100) NOT NULL,
   CONSTRAINT pk_usuario
     PRIMARY KEY (id),
+  CONSTRAINT uk_usuario_pasaporte UNIQUE (pasaporte),    --$ UNIQUE
+  CONSTRAINT uk_usuario_telefono UNIQUE (telefono),    --$ UNIQUE
   CONSTRAINT fk_usuario_municipio
     FOREIGN KEY (municipio, poblacion)
     REFERENCES municipios(nombre, poblacion)
@@ -214,6 +223,8 @@ CREATE TABLE prestamos (
   comentario VARCHAR2(2000),
   CONSTRAINT pk_prestamo
     PRIMARY KEY (id),
+  CONSTRAINT uk_prestamo_id_usuario UNIQUE (id_usuario),    --$ UNIQUE
+  CONSTRAINT uk_prestamo_signatura UNIQUE (signatura),    --$ UNIQUE
   CONSTRAINT fk_prestamo_usuario
     FOREIGN KEY (id_usuario)
     REFERENCES usuarios(id),
@@ -231,6 +242,8 @@ CREATE TABLE reservas (
   fecha_fin DATE NOT NULL,
   CONSTRAINT pk_reserva
     PRIMARY KEY (id),
+  CONSTRAINT uk_reserva_id_usuario UNIQUE (id_usuario),    --$ UNIQUE
+  CONSTRAINT uk_reserva_signatura UNIQUE (signatura),    --$ UNIQUE
   CONSTRAINT fk_reserva_usuario
     FOREIGN KEY (id_usuario)
     REFERENCES usuarios(id),
@@ -247,6 +260,7 @@ CREATE TABLE sanciones (
   fecha_fin DATE NOT NULL,
   CONSTRAINT pk_sancion
     PRIMARY KEY (id),
+  CONSTRAINT uk_sancion_id_usuario UNIQUE (id_usuario),    --$ UNIQUE
   CONSTRAINT fk_sancion_usuario
     FOREIGN KEY (id_usuario)
     REFERENCES usuarios(id)
