@@ -23,7 +23,8 @@ CREATE TABLE bibuses (
   estado VARCHAR2(20) NOT NULL,
   ultima_itv DATE NOT NULL,
   proxima_itv DATE NOT NULL,
-  PRIMARY KEY (matricula),
+  CONSTRAINT pk_bibus
+    PRIMARY KEY (matricula),
   CONSTRAINT ck_bibus_estado CHECK (estado IN ('disponible', 'en ruta', 'en revision'))
 );
 
@@ -37,7 +38,8 @@ CREATE TABLE paradas (
   fecha DATE NOT NULL,
   hora VARCHAR2(8) NOT NULL,
   direccion VARCHAR2(100) NOT NULL,
-  PRIMARY KEY (id),
+  CONSTRAINT pk_parada
+    PRIMARY KEY (id),
   CONSTRAINT fk_parada_ruta
     FOREIGN KEY (id_ruta)
     REFERENCES rutas(id)
@@ -66,7 +68,8 @@ CREATE TABLE bibuseros (
   fin_contrato DATE,
   estado VARCHAR2(15) DEFAULT 'en descanso' NOT NULL,
   matricula_bibus VARCHAR2(10),
-  PRIMARY KEY (pasaporte),
+  CONSTRAINT pk_bibusero
+    PRIMARY KEY (pasaporte),
   CONSTRAINT fk_bibusero_bibus
     FOREIGN KEY (matricula_bibus)
     REFERENCES bibuses(matricula)
@@ -79,7 +82,8 @@ CREATE TABLE rutas (
   id VARCHAR2(10) NOT NULL,
   fecha DATE NOT NULL,
   matricula_bibus VARCHAR(10) NOT NULL,
-  PRIMARY KEY (id),
+  CONSTRAINT pk_ruta
+    PRIMARY KEY (id),
   CONSTRAINT fk_ruta_bibus
     FOREIGN KEY (matricula_bibus)
     REFERENCES bibuses(matricula)
@@ -92,7 +96,8 @@ CREATE TABLE municipios (
   poblacion VARCHAR2(20) NOT NULL,
   provincia VARCHAR2(30) NOT NULL,
   tiene_libreria VARCHAR2(15),
-  PRIMARY KEY (nombre, poblacion),
+  CONSTRAINT pk_municipio
+    PRIMARY KEY (nombre, poblacion),
   CONSTRAINT ck_municipio_tiene_libreria CHECK (tiene_libreria IN ('S', 'N'))
 );
 
@@ -106,7 +111,8 @@ CREATE TABLE bibliotecas (
   direccion VARCHAR(200) NOT NULL,
   municipio VARCHAR(100) NOT NULL,
   poblacion VARCHAR(100) NOT NULL,
-  PRIMARY KEY (cif),
+  CONSTRAINT pk_biblioteca
+    PRIMARY KEY (cif),
   CONSTRAINT fk_biblioteca_municipio
     FOREIGN KEY (municipio, poblacion)
     REFERENCES municipios(nombre, poblacion)
@@ -125,7 +131,8 @@ CREATE TABLE usuarios (
   direccion VARCHAR2(200) NOT NULL,
   municipio VARCHAR2(100) NOT NULL,
   poblacion VARCHAR2(100) NOT NULL,
-  PRIMARY KEY (id),
+  CONSTRAINT pk_usuario
+    PRIMARY KEY (id),
   CONSTRAINT fk_usuario_municipio
     FOREIGN KEY (municipio, poblacion)
     REFERENCES municipios(nombre, poblacion)
@@ -144,7 +151,8 @@ CREATE TABLE libros (
   otros_autores VARCHAR2(200),
   mencion_autores VARCHAR2(200),
   notas_contenido VARCHAR2(500),
-  PRIMARY KEY (titulo, autor_principal)
+  CONSTRAINT pk_libro
+    PRIMARY KEY (titulo, autor_principal)
 );
 
 -- NO MODIFICAR
@@ -166,7 +174,8 @@ CREATE TABLE ediciones (
   notas VARCHAR2(500),
   id_biblioteca_nacional VARCHAR2(30) NOT NULL,
   url_edicion VARCHAR2(200),
-  PRIMARY KEY (isbn),
+  CONSTRAINT pk_edicion
+    PRIMARY KEY (isbn),
   CONSTRAINT fk_edicion_libro
     FOREIGN KEY (titulo, autor_principal)
     REFERENCES libros(titulo, autor_principal)
@@ -182,7 +191,8 @@ CREATE TABLE ejemplares (
   dado_de_baja VARCHAR2(15) DEFAULT 'N',
   fecha_baja DATE,
   comentarios_bibusero VARCHAR(500),
-  PRIMARY KEY (signatura),
+  CONSTRAINT pk_ejemplar
+    PRIMARY KEY (signatura),
   CONSTRAINT fk_ejemplar_libro
     FOREIGN KEY (titulo, autor_principal)
     REFERENCES libros(titulo, autor_principal),
@@ -202,7 +212,8 @@ CREATE TABLE prestamos (
   fecha_devolucion DATE,
   fecha_comentario DATE,
   comentario VARCHAR2(2000),
-  PRIMARY KEY (id),
+  CONSTRAINT pk_prestamo
+    PRIMARY KEY (id),
   CONSTRAINT fk_prestamo_usuario
     FOREIGN KEY (id_usuario)
     REFERENCES usuarios(id),
@@ -218,7 +229,8 @@ CREATE TABLE reservas (
   signatura VARCHAR2(20) NOT NULL,
   fecha_inicio DATE NOT NULL,
   fecha_fin DATE NOT NULL,
-  PRIMARY KEY (id),
+  CONSTRAINT pk_reserva
+    PRIMARY KEY (id),
   CONSTRAINT fk_reserva_usuario
     FOREIGN KEY (id_usuario)
     REFERENCES usuarios(id),
@@ -233,7 +245,8 @@ CREATE TABLE sanciones (
   id_usuario INT NOT NULL,
   fecha_inicio DATE NOT NULL,
   fecha_fin DATE NOT NULL,
-  PRIMARY KEY (id),
+  CONSTRAINT pk_sancion
+    PRIMARY KEY (id),
   CONSTRAINT fk_sancion_usuario
     FOREIGN KEY (id_usuario)
     REFERENCES usuarios(id)
