@@ -57,7 +57,7 @@ CREATE TABLE paradas (
 -- NO MODIFICAR
 CREATE TABLE bibuseros (
   pasaporte VARCHAR2(20) NOT NULL,
-  email VARCHAR(50) NOT NULL,
+  email VARCHAR2(50) NOT NULL,
   nombre VARCHAR2(20) NOT NULL,
   apellido1 VARCHAR2(20) NOT NULL,
   apellido2 VARCHAR2(20),
@@ -83,7 +83,7 @@ CREATE TABLE bibuseros (
 CREATE TABLE rutas (
   id VARCHAR2(10) NOT NULL,
   fecha DATE NOT NULL,
-  matricula_bibus VARCHAR(10) NOT NULL,
+  matricula_bibus VARCHAR2(10) NOT NULL,
   CONSTRAINT pk_ruta
     PRIMARY KEY (id),
   CONSTRAINT uk_ruta_matricula_bibus UNIQUE (matricula_bibus),    --$ UNIQUE
@@ -95,7 +95,7 @@ CREATE TABLE rutas (
 
 -- NO MODIFICAR
 CREATE TABLE municipios (
-  nombre VARCHAR(50) NOT NULL,
+  nombre VARCHAR2(50) NOT NULL,
   poblacion VARCHAR2(20) NOT NULL,
   provincia VARCHAR2(30) NOT NULL,
   tiene_libreria VARCHAR2(15),
@@ -106,14 +106,14 @@ CREATE TABLE municipios (
 
 -- NO MODIFICAR
 CREATE TABLE bibliotecas (
-  cif VARCHAR(20) NOT NULL,
-  email VARCHAR(100) NOT NULL,
-  nombre VARCHAR(150) NOT NULL,
+  cif VARCHAR2(20) NOT NULL,
+  email VARCHAR2(100) NOT NULL,
+  nombre VARCHAR2(150) NOT NULL,
   fecha_fundacion DATE NOT NULL,
   telefono CHAR(9) NOT NULL,
-  direccion VARCHAR(200) NOT NULL,
-  municipio VARCHAR(100) NOT NULL,
-  poblacion VARCHAR(100) NOT NULL,
+  direccion VARCHAR2(200) NOT NULL,
+  municipio VARCHAR2(100) NOT NULL,
+  poblacion VARCHAR2(100) NOT NULL,
   CONSTRAINT pk_biblioteca
     PRIMARY KEY (cif),
   CONSTRAINT uk_biblioteca_telefono UNIQUE (telefono),    --$ UNIQUE
