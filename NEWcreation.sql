@@ -188,7 +188,7 @@ CREATE TABLE ejemplares (
 -- NO MODIFICAR
 CREATE TABLE prestamos (
   id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
-  id_usuario INT NOT NULL,
+  id_usuario NUMBER(10) NOT NULL,       --longitud en la base de datos obsoleta (10)
   signatura VARCHAR2(20) NOT NULL,
   fecha_prestamo DATE,
   fecha_devolucion DATE,
@@ -211,7 +211,7 @@ CREATE TABLE prestamos (
 -- NO MODIFICAR
 CREATE TABLE reservas (
   id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
-  id_usuario INT NOT NULL,
+  id_usuario NUMBER(10) NOT NULL,
   signatura VARCHAR2(20) NOT NULL,
   fecha_inicio DATE NOT NULL,
   fecha_fin DATE NOT NULL,
@@ -230,7 +230,7 @@ CREATE TABLE reservas (
 -- NO MODIFICAR
 CREATE TABLE sanciones (
   id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
-  id_usuario INT NOT NULL,
+  id_usuario NUMBER(10) NOT NULL,
   fecha_inicio DATE NOT NULL,
   fecha_fin DATE NOT NULL,
   CONSTRAINT pk_sancion
