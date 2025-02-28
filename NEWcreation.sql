@@ -220,6 +220,8 @@ CREATE TABLE prestamos (
   fecha_devolucion DATE,
   fecha_comentario DATE,
   comentario VARCHAR2(2000),
+  likes INT NOT NULL,
+  dislikes INT NOT NULL,
   CONSTRAINT pk_prestamo
     PRIMARY KEY (id),
   CONSTRAINT uk_prestamo_id_usuario UNIQUE (id_usuario),    --$ UNIQUE
