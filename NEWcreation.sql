@@ -29,32 +29,6 @@ CREATE TABLE bibuses (
 );
 
 -- NO MODIFICAR
-CREATE TABLE paradas (
-  id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
-  id_ruta VARCHAR2(10) NOT NULL,
-  matricula_bibus VARCHAR2(10) NOT NULL,
-  municipio VARCHAR2(50) NOT NULL,
-  poblacion VARCHAR2(10) NOT NULL,
-  fecha DATE NOT NULL,
-  hora VARCHAR2(8) NOT NULL,
-  direccion VARCHAR2(100) NOT NULL,
-  CONSTRAINT pk_parada
-    PRIMARY KEY (id),
-  CONSTRAINT fk_parada_ruta
-    FOREIGN KEY (id_ruta)
-    REFERENCES rutas(id)
-    ON DELETE CASCADE,
-  CONSTRAINT fk_parada_bibus
-    FOREIGN KEY (matricula_bibus)
-    REFERENCES bibuses(matricula)
-    ON DELETE CASCADE,
-  CONSTRAINT fk_parada_municipio
-    FOREIGN KEY (municipio, poblacion)
-    REFERENCES municipios(nombre, poblacion)
-    ON DELETE CASCADE
-);
-
--- NO MODIFICAR
 CREATE TABLE bibuseros (
   pasaporte VARCHAR2(20) NOT NULL,
   email VARCHAR2(50) NOT NULL,
@@ -265,6 +239,32 @@ CREATE TABLE sanciones (
   CONSTRAINT fk_sancion_usuario
     FOREIGN KEY (id_usuario)
     REFERENCES usuarios(id)
+);
+
+-- NO MODIFICAR
+CREATE TABLE paradas (
+  id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
+  id_ruta VARCHAR2(10) NOT NULL,
+  matricula_bibus VARCHAR2(10) NOT NULL,
+  municipio VARCHAR2(50) NOT NULL,
+  poblacion VARCHAR2(10) NOT NULL,
+  fecha DATE NOT NULL,
+  hora VARCHAR2(8) NOT NULL,
+  direccion VARCHAR2(100) NOT NULL,
+  CONSTRAINT pk_parada
+    PRIMARY KEY (id),
+  CONSTRAINT fk_parada_ruta
+    FOREIGN KEY (id_ruta)
+    REFERENCES rutas(id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_parada_bibus
+    FOREIGN KEY (matricula_bibus)
+    REFERENCES bibuses(matricula)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_parada_municipio
+    FOREIGN KEY (municipio, poblacion)
+    REFERENCES municipios(nombre, poblacion)
+    ON DELETE CASCADE
 );
 
 COMMIT;
