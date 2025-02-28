@@ -41,7 +41,7 @@ CREATE TABLE paradas (
   CONSTRAINT pk_parada
     PRIMARY KEY (id),
   CONSTRAINT uk_parada_id_ruta UNIQUE (id_ruta),    --$ UNIQUE
-  CONSTRAINT uk_parada_municipio UNIQUE (telefono),    --$ UNIQUE
+  CONSTRAINT uk_parada_municipio UNIQUE (municipio),    --$ UNIQUE
   CONSTRAINT uk_parada_direccion UNIQUE (direccion),    --$ UNIQUE
   CONSTRAINT fk_parada_ruta
     FOREIGN KEY (id_ruta)
@@ -73,6 +73,7 @@ CREATE TABLE bibuseros (
   matricula_bibus VARCHAR2(10),
   CONSTRAINT pk_bibusero
     PRIMARY KEY (pasaporte),
+  CONSTRAINT uk_bibusero_email UNIQUE (email),          --$ UNIQUE
   CONSTRAINT uk_bibusero_telefono UNIQUE (telefono),    --$ UNIQUE
   CONSTRAINT fk_bibusero_bibus
     FOREIGN KEY (matricula_bibus)
